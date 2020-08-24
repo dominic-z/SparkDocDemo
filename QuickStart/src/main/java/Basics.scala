@@ -12,7 +12,7 @@ object Basics {
 
     val textFile=spark.read.textFile("demo.txt")
     println("1"+textFile.count())
-    println("2:"+textFile.first())
+    println("2:g"+textFile.first())
 
     val linesWithSpark=textFile.filter(line=>line.contains("spark"))
     println("3:"+linesWithSpark.count())
