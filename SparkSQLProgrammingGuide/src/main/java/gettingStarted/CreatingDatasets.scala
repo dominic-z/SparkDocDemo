@@ -1,5 +1,6 @@
 package gettingStarted
 
+import cases.Person
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
@@ -65,5 +66,5 @@ object CreatingDatasets {
 
 }
 
-case class Person(name:String,age:Long)
+
 
