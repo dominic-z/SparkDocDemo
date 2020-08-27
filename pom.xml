@@ -18,6 +18,7 @@
         <scala.version>2.12</scala.version>
         <spark.version>2.4.6</spark.version>
         <jdk.version>1.8</jdk.version>
+        <scala.maven.plugin.version>3.4.6</scala.maven.plugin.version>
     </properties>
 
     <dependencies>
