@@ -18,9 +18,9 @@ object Demo {
 
   def main(args: Array[String]): Unit = {
 
-    //    simpleJoin
-//    casesDfJoin
-    nestedCasesDfAndSimpleDfJoin
+    simpleJoin
+    //    casesDfJoin
+    //    nestedCasesDfAndSimpleDfJoin
   }
 
   def simpleJoin(implicit spark: SparkSession, sc: SparkContext): Unit = {
@@ -33,6 +33,18 @@ object Demo {
     val resDf = leftDS.join(rightDS2, $"name" <=> $"stuName" && $"age" <=> $"stuAge")
     resDf.show()
 
+
+    var joinWithTheSameName = leftDS.join(leftDS, leftDS("name")===leftDS("name"))
+    joinWithTheSameName.show()
+
+    joinWithTheSameName = leftDS.as("left").join(leftDS.as("right"), $"left.name".as("leftName") <=> $"right.name")
+    joinWithTheSameName.show() //不好使
+
+    //    joinWithTheSameName.select("name").show()// 会报错的，因为这里有多个列都叫name 解决方法见博客
+    joinWithTheSameName.select($"left.name",$"right.name".as("rightName"),$"right.age").show()//好使
+
+    joinWithTheSameName = leftDS.as("left").join(leftDS.as("right"), Seq("name"))
+    joinWithTheSameName.show() //只剩下一个name了，但还是会有两个age
   }
 
   def casesDfJoin(implicit spark: SparkSession, sc: SparkContext): Unit = {
@@ -54,7 +66,7 @@ object Demo {
 
     val rightDs = spark.createDataset(rightRdd)
     rightDs.show()
-    val rightDf=rightDs.withColumnRenamed("_1","right_name").withColumnRenamed("_2","right_age").withColumnRenamed("_3","right_score")
+    val rightDf = rightDs.withColumnRenamed("_1", "right_name").withColumnRenamed("_2", "right_age").withColumnRenamed("_3", "right_score")
     rightDf.show()
 
     //

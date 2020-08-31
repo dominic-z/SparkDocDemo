@@ -18,7 +18,8 @@ object OpDFDS {
 
   def main(args: Array[String]): Unit = {
 
-    createDsWithTuple
+//    createDsWithTuple
+    filterDemo
   }
 
   def createDsWithTuple(implicit spark: SparkSession, sc: SparkContext): Unit = {
@@ -35,6 +36,12 @@ object OpDFDS {
     val studentScoreDs = Seq(StudentScore(Student("mike", 19), 89), StudentScore(Student("tom", 20), 87)).toDS()
 
 
+  }
+
+  def filterDemo(implicit spark: SparkSession, sc: SparkContext)={
+    val ds=sc.parallelize(Seq(Student("s1", 12), Student("s2", 12),Student("s3", 12))).toDS()
+    val res=ds.filter("stuName in ('s1','s2')").filter("stuName='s2'")
+    res.show()
   }
 
 }

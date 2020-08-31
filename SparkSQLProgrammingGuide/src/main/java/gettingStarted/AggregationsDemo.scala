@@ -4,14 +4,38 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, Row, SparkSession}
 import org.apache.spark.sql.expressions.{Aggregator, MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.types.{DataType, DoubleType, LongType, StructField, StructType}
+import org.apache.spark.sql.functions._
 
 object AggregationsDemo {
-  def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setAppName("local").setMaster("local[2]")
-    val sc = new SparkContext(sparkConf)
-    val spark = SparkSession.builder().config(sparkConf).getOrCreate()
-    import spark.implicits._
+  implicit val sparkConf = new SparkConf().setAppName("local").setMaster("local[2]")
+  implicit val sc = new SparkContext(sparkConf)
+  implicit val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
+  import spark.implicits._
+
+  def main(args: Array[String]): Unit = {
+
+    simpleAgg
+
+  }
+
+  def simpleAgg(implicit sc: SparkContext, spark: SparkSession): Unit = {
+    val df = spark.read.json("employeesForAgg.json")
+    df.createOrReplaceTempView("employees")
+    df.show()
+    var aggDf = df.groupBy($"name").agg(sum("salary"), min("salary"))
+      .withColumnRenamed("sum(salary)", "sum")
+      .withColumnRenamed("min(salary)", "min")
+    aggDf.show()
+
+    aggDf = df.groupBy($"name",$"gender").agg(sum("salary"), min("salary"))
+      .withColumnRenamed("sum(salary)", "sum")
+      .withColumnRenamed("min(salary)", "min")
+    aggDf.show()
+    //    df.grou
+  }
+
+  def userDefinedAgg(implicit sc: SparkContext, spark: SparkSession): Unit = {
     spark.udf.register("myAverage", MyAverage1)
 
     val df = spark.read.json("employees.json")
