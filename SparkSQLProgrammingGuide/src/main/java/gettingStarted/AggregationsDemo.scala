@@ -28,11 +28,13 @@ object AggregationsDemo {
       .withColumnRenamed("min(salary)", "min")
     aggDf.show()
 
-    aggDf = df.groupBy($"name",$"gender").agg(sum("salary"), min("salary"))
+    aggDf = df.groupBy($"name", $"gender").agg(sum("salary"), min("salary"))
       .withColumnRenamed("sum(salary)", "sum")
       .withColumnRenamed("min(salary)", "min")
     aggDf.show()
-    //    df.grou
+
+    aggDf = df.groupBy($"name", $"gender").agg(sum("salary"), min("salary"), count("*"))
+    aggDf.show()
   }
 
   def userDefinedAgg(implicit sc: SparkContext, spark: SparkSession): Unit = {
