@@ -2,15 +2,17 @@ package gettingStarted
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.junit.Test
 
 import scala.io.Source
 
-object CreatingDataFrames {
-  def main(args: Array[String]): Unit = {
-    val sparkConf=new SparkConf().setAppName("local").setMaster("local[2]")
-    val sc=new SparkContext(sparkConf)
-    val spark=SparkSession.builder().config(sparkConf).getOrCreate()
-    import spark.implicits._
+class CreatingDataFrames {
+  val sparkConf=new SparkConf().setAppName("local").setMaster("local[2]")
+  val sc=new SparkContext(sparkConf)
+  val spark=SparkSession.builder().config(sparkConf).getOrCreate()
+  import spark.implicits._
+  @Test
+  def createDf(): Unit = {
 
     val df = spark.read.json("people.json")
 

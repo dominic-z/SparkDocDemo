@@ -4,9 +4,11 @@ import cases.Person
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.junit.Test
 
-object CreatingDatasets {
-  def main(args: Array[String]): Unit = {
+class CreatingDatasets {
+  @Test
+  def createDs(): Unit = {
     val sparkConf=new SparkConf().setAppName("local").setMaster("local[2]")
     val sc=new SparkContext(sparkConf)
     val spark=SparkSession.builder().config(sparkConf).getOrCreate()

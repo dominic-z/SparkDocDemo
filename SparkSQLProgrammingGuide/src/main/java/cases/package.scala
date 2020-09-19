@@ -7,4 +7,6 @@ package object cases {
   case class Person(name:String,age:Long)
 
   case class StudentScore(student: Student,score:Int)
+
+  case class Employer(name:String,city:String,sex:Int,salary:Double)
 }

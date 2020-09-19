@@ -9,6 +9,12 @@ import scala.collection.mutable
  */
 class Demo {
   @Test
+  def show(): Unit ={
+    val ds=20200812
+    println("p_"+20200812)
+  }
+
+  @Test
   def atDemo(): Unit = {
     val o: Option[Int] = Some(2)
     o match {

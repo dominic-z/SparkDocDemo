@@ -1,25 +1,24 @@
 package gettingStarted
 
+import cases.Student
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, Row, SparkSession}
 import org.apache.spark.sql.expressions.{Aggregator, MutableAggregationBuffer, UserDefinedAggregateFunction}
 import org.apache.spark.sql.types.{DataType, DoubleType, LongType, StructField, StructType}
 import org.apache.spark.sql.functions._
+import org.junit.Test
 
-object AggregationsDemo {
+import scala.collection.immutable
+
+class AggregationsDemo {
   implicit val sparkConf = new SparkConf().setAppName("local").setMaster("local[2]")
   implicit val sc = new SparkContext(sparkConf)
   implicit val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
   import spark.implicits._
 
-  def main(args: Array[String]): Unit = {
-
-    simpleAgg
-
-  }
-
-  def simpleAgg(implicit sc: SparkContext, spark: SparkSession): Unit = {
+  @Test
+  def simpleAgg(): Unit = {
     val df = spark.read.json("employeesForAgg.json")
     df.createOrReplaceTempView("employees")
     df.show()
@@ -35,9 +34,29 @@ object AggregationsDemo {
 
     aggDf = df.groupBy($"name", $"gender").agg(sum("salary"), min("salary"), count("*"))
     aggDf.show()
-  }
 
-  def userDefinedAgg(implicit sc: SparkContext, spark: SparkSession): Unit = {
+    aggDf = df.groupBy($"name", $"gender").agg(immutable.Map("salary" -> "sum"))
+    aggDf.show()
+
+    aggDf = df.agg(sum("salary"), min("salary"))
+    aggDf.show()
+
+  }
+  @Test
+  def nullDfAgg(): Unit = {
+    // 对于null也是可以group的
+    val rdd = sc.parallelize(Seq(Student("s1", 13), Student("s2", 12),Student("s2", 12),Student(null, 12),Student(null, 13)))
+    val df=rdd.toDF()
+    df.groupBy("stuName").agg(mean("stuAge")).show()
+  }
+  @Test
+  def groupWithoutName(): Unit ={
+    val ds=sc.parallelize(Seq((1,2,3),(4,5,6))).toDS()
+    val groupRes=ds.groupBy($"_1").agg(sum($"_2"))
+    groupRes.show()
+  }
+  @Test
+  def userDefinedAgg(): Unit = {
     spark.udf.register("myAverage", MyAverage1)
 
     val df = spark.read.json("employees.json")
