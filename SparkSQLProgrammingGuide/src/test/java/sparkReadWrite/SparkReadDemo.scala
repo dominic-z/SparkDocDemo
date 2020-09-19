@@ -17,7 +17,7 @@ class SparkReadDemo {
   @Test
   def sparkReadMysql()={
     //    注意，由于scala里，AnyVal的子类不包括null，即scala中的Long不能被赋值为null，因此如果下面例子里row.getLong(1)时，如果数据库里存的是null，那么会报错，而row.get(1)就不会，因为这个方法返回的是Any类型的
-    val (url,usr,password)=("jdbc:mysql://9.135.91.214:3306/test","root","admin")
+    val (url,usr,password)=("url","user","password")
     val props=new Properties()
     props.put("driver", "com.mysql.jdbc.Driver")
     props.put("user", usr)

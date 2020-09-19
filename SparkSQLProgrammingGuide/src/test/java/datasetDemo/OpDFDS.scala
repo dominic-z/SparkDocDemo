@@ -2,7 +2,8 @@ package datasetDemo
 
 import cases.{Employer, Person, Student, StudentScore}
 import org.apache.commons.lang3.RandomStringUtils
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.{SparkSession, TypedColumn}
+import org.apache.spark.sql.functions._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.Test
 
@@ -178,6 +179,36 @@ class OpDFDS {
     })
     shown.show()
 
+  }
+
+  @Test
+  def groupByKey():Unit={
+    //groupByKey的功能就是自定义一个key，把相同key的row聚合起来进行操作
+    val df = sc.parallelize(Seq(Student("s1", 11), Student("s2", 200), Student("s3", 120),Student("s4", 220),Student("s4", 1200))).toDF()
+    val kvDf=df.groupByKey(row=>{
+      val age=row.getAs[Int]("stuAge")
+      if(age<10)
+        "level1"
+      else if(age<100)
+        "level2"
+      else if(age<1000)
+        "level3"
+      else if(age<10000)
+        "level4"
+      else
+        "level5"
+    })
+
+    kvDf.count().show()
+
+    kvDf.agg(mean("stuAge").as(newDoubleEncoder)).show()// 一定要用as来将一个普通的colmn变为typedColumn，具体的encoder的意义见api
+    kvDf.mapGroups((s,iterRows)=>{
+      var sum=0
+      for(row<-iterRows){
+        sum+=row.getInt(1)
+      }
+      (s,sum)
+    }).show()
   }
 
 }
