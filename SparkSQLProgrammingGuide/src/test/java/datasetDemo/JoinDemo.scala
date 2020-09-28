@@ -1,6 +1,7 @@
 package datasetDemo
 
 import cases.{Person, Student, StudentScore}
+import gettingStarted.Employee
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -32,9 +33,9 @@ class JoinDemo {
   @Test
   def simpleJoin(): Unit = {
 
-    val leftDS = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
+    var leftDS = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
 
-    val rightDS = Seq(Student("Andy", 32)).toDS()
+    var rightDS = Seq(Student("Andy", 32)).toDS()
 
     //    多列进行join
     val resDf = leftDS.join(rightDS, $"name" <=> $"stuName" && $"age" <=> $"stuAge")
@@ -53,6 +54,14 @@ class JoinDemo {
 
     joinWithTheSameName = leftDS.as("left").join(leftDS.as("right"), Seq("name"))
     joinWithTheSameName.show() //只剩下一个name了，但还是会有两个age，但这个不重要
+
+    joinWithTheSameName = leftDS.as("left").join(leftDS.as("right"), "name")
+    joinWithTheSameName.show()
+
+    val rightEmpDS = Seq(Employee("Andy", 32)).toDS()
+    leftDS.join(rightEmpDS,Seq("name")).show()
+    rightEmpDS.join(leftDS,Seq("name")).show()//观察顺序可以发现，join的列会在最前面，然后是左表然后是右表
+    println("")
   }
 
   /**

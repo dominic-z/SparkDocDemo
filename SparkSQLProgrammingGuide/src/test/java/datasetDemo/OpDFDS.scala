@@ -32,6 +32,62 @@ class OpDFDS {
   }
 
   @Test
+  def testSql():Unit={
+    val df = sc.parallelize(Seq((4L, 5d, 6,"a","1"))).toDF()
+    df.where($"_5"===1).show()
+    df.where($"_5"equalTo (1)).show()
+    df.where($"_5"equalTo (1)).show()
+  }
+
+  @Test
+  def testRowType():Unit={
+    val df = sc.parallelize(Seq((4L, 5d, 6,"a"))).toDF()
+//    下面四种方法都会报错，因为row的类型只要不匹配，转换都会失败
+//    df.map(row=>{
+//      row.getAs[Double](0)
+//    }).show()
+
+//    df.map(row=>{
+//      row.getAs[Double](2)
+//    }).show()
+
+//    df.map(row=>{
+//      row.getAs[Long](2)
+//    }).show()
+
+//    df.map(row=>{
+//      row.getLong(2)
+//    }).show()
+  }
+
+  @Test
+  def createWithCaseClass(): Unit = {
+    val rdd = sc.parallelize(Seq(Student("person", 13), Student("student", 12)))
+
+    val df = rdd.toDF()
+    df.show()
+    df.toDF("newName","newAge").show()
+
+    val row = df.take(1)(0)
+    println(row.getInt(0), row.getInt(1))
+    //    println(row.getInt(0), row.getString(1))
+    //    println(row.getDouble(0), row.getDouble(1))
+  }
+  @Test
+  def createWithNestedCaseClass(): Unit = {
+    val studentScoreDs = Seq(StudentScore(Student("mike", 19), 89), StudentScore(Student("tom", 20), 87)).toDS()
+
+  }
+
+  @Test
+  def select():Unit={
+    val rdd = sc.parallelize(Seq(Student("person", 13), Student("student", 12)))
+    val df = rdd.toDF()
+    val row1Name="stuName"
+    df.select(col("stuName"),$"stuAge").show()
+  }
+
+  @Test
   def opDfWithNull():Unit={
     val df = sc.parallelize(Seq((4, 5, null))).toDF("f1", "f2", "f3")
     for (row <- df.take(3)) {
@@ -100,23 +156,7 @@ class OpDFDS {
     val ds2 = sc.parallelize(Seq((1, 2, 3), (4, 5, 6))).toDS()
     ds1.union(ds2).show()
   }
-  @Test
-  def createWithCaseClass(): Unit = {
-    val rdd = sc.parallelize(Seq(Student("person", 13), Student("student", 12)))
 
-    val df = rdd.toDF()
-    df.show()
-
-    val row = df.take(1)(0)
-    println(row.getInt(0), row.getInt(1))
-    //    println(row.getInt(0), row.getString(1))
-    //    println(row.getDouble(0), row.getDouble(1))
-  }
-  @Test
-  def createWithNestedCaseClass(): Unit = {
-    val studentScoreDs = Seq(StudentScore(Student("mike", 19), 89), StudentScore(Student("tom", 20), 87)).toDS()
-
-  }
   @Test
   def filterDemo() = {
     val ds = sc.parallelize(Seq(Student("s1", 12), Student("s2", 12), Student("s3", 12))).toDS()
@@ -209,6 +249,12 @@ class OpDFDS {
       }
       (s,sum)
     }).show()
+  }
+
+  @Test
+  def emptyDsGroupBy():Unit={
+    val df = sc.parallelize(Seq(Student("s1", 11), Student("s2", 200), Student("s3", 120),Student("s4", 220),Student("s4", 1200))).toDF()
+    df.filter(_=>false).agg(sum("stuAge")).show()
   }
 
 }

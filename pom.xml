@@ -12,6 +12,7 @@
         <module>QuickStart</module>
         <module>RDDProgrammingGuide</module>
         <module>SparkSQLProgrammingGuide</module>
+        <module>MLlib</module>
     </modules>
 
     <properties>
@@ -62,6 +63,17 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.scala-lang/scala-library &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.scala-lang</groupId>-->

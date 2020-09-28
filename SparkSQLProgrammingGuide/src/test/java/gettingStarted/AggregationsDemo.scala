@@ -48,6 +48,8 @@ class AggregationsDemo {
     val rdd = sc.parallelize(Seq(Student("s1", 13), Student("s2", 12),Student("s2", 12),Student(null, 12),Student(null, 13)))
     val df=rdd.toDF()
     df.groupBy("stuName").agg(mean("stuAge")).show()
+
+
   }
   @Test
   def groupWithoutName(): Unit ={
