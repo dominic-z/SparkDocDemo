@@ -3,12 +3,13 @@ package main
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
-
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.classification.DecisionTreeClassifier
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
 import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+import org.apache.spark.ml.linalg.SparseVector
+import org.apache.spark.sql.functions._
 
 /**
  * @author dominiczhu
@@ -18,10 +19,12 @@ class DecisionTreeDemo {
   val sparkConf = new SparkConf().setAppName("local").setMaster("local[5]")
   val sc = new SparkContext(sparkConf)
   val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+
   import spark.implicits._
+
   @Test
-  def testDecisionTreeDemo():Unit={
-    // Load the data stored in LIBSVM format as a DataFrame. 文件之中的1:10，对应的是0：10，从0计数
+  def testDecisionTreeDemo(): Unit = {
+    // Load the data stored in LIBSVM format as a DataFrame. 文件之中的1:10，第0个特征取值为10
     val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
     data.show()
     // Index labels, adding metadata to the label column.
@@ -31,8 +34,8 @@ class DecisionTreeDemo {
       .setInputCol("label")
       .setOutputCol("indexedLabel")
       .fit(data)
-    val example1=labelIndexer.transform(data).collect()
-    println(example1.take(1))
+    val example1 = labelIndexer.transform(data).collect()
+    println(example1.take(1).toSeq)
 
     // Automatically identify categorical features, and index them.
     // 这个玩意的功能就是从数据中抽取类别特征与连续特征，如果某一列取值数目大于4的会被当做连续值，不做映射
@@ -43,8 +46,8 @@ class DecisionTreeDemo {
       .setOutputCol("indexedFeatures")
       .setMaxCategories(4) // features with > 4 distinct values are treated as continuous.
       .fit(data)
-    val example2=featureIndexer.transform(data).collect()
-    println(example2.take(1))
+    val example2 = featureIndexer.transform(data).collect()
+    println(example2.take(1).toSeq)
     // Split the data into training and test sets (30% held out for testing).
     val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
 
@@ -82,5 +85,41 @@ class DecisionTreeDemo {
 
     val treeModel = model.stages(2).asInstanceOf[DecisionTreeClassificationModel]
     println(s"Learned classification tree model:\n ${treeModel.toDebugString}")
+  }
+
+  @Test
+  def justDamnFit(): Unit = {
+    //    spark里的这些个模型是一定要被pipeline包起来的
+    //    输入进各种模型里特征必须是Vector的，可以是DenseVector也可以是SparseVector，构造方法可以查看api
+    val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
+    val dt = new DecisionTreeClassifier()
+      .setLabelCol("label")
+      .setFeaturesCol("features")
+    val pipeline = new Pipeline()
+      .setStages(Array(dt))
+
+    val model = pipeline.fit(data)
+    val predictions = model.transform(data)
+    predictions.show(10)
+  }
+
+  @Test
+  def modelInputWithArray(): Unit = {
+    //    spark里的这些个模型是一定要被pipeline包起来的
+    //    输入进各种模型里特征必须是Vector的，可以是DenseVector也可以是SparseVector，构造方法可以查看api
+    val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt").map(row => {
+      val label = row.getDouble(0)
+      val featureArr = row.getAs[SparseVector](1).toArray
+      (label,featureArr)
+    })
+    val dt = new DecisionTreeClassifier()
+      .setLabelCol("_1")
+      .setFeaturesCol("_2")
+    val pipeline = new Pipeline()
+      .setStages(Array(dt))
+
+    val model = pipeline.fit(data) // 报错，不可以输入arr
+    val predictions = model.transform(data)
+    predictions.show(10)
   }
 }
