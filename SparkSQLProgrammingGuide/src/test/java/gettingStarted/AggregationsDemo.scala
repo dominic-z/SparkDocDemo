@@ -1,6 +1,6 @@
 package gettingStarted
 
-import cases.Student
+import cases.{Person, Student}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, Row, SparkSession}
 import org.apache.spark.sql.expressions.{Aggregator, MutableAggregationBuffer, UserDefinedAggregateFunction}
@@ -38,8 +38,10 @@ class AggregationsDemo {
     aggDf = df.groupBy($"name", $"gender").agg(immutable.Map("salary" -> "sum"))
     aggDf.show()
 
-    aggDf = df.agg(sum("salary"), min("salary"))
+    //    如果df为空，在有groupBy的情况下进行agg，那么agg的结果会返回空
+    aggDf=df.filter($"gender".equalTo(2)).groupBy($"name").agg(sum("salary"), min("salary"))
     aggDf.show()
+
 
   }
   @Test
@@ -48,9 +50,17 @@ class AggregationsDemo {
     val rdd = sc.parallelize(Seq(Student("s1", 13), Student("s2", 12),Student("s2", 12),Student(null, 12),Student(null, 13)))
     val df=rdd.toDF()
     df.groupBy("stuName").agg(mean("stuAge")).show()
-
-
   }
+
+  @Test
+  def globalAgg():Unit={
+    val df = spark.read.json("employeesForAgg.json")
+    df.agg(sum("salary")).show()
+
+//    如果df为空，在没有groupBy的情况下进行全局agg，那么agg的结果会返回一行null
+    df.filter($"gender".equalTo(2)).agg(sum("age")).show()
+  }
+
   @Test
   def groupWithoutName(): Unit ={
     val ds=sc.parallelize(Seq((1,2,3),(4,5,6))).toDS()

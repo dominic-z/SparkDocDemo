@@ -193,9 +193,18 @@ class OpDFDS {
     }).reduceByKey((r1, r2) => {
       r1 + r2
     }).toDF().show()
-
   }
-@Test
+
+  @Test
+  def mapWithEmptyDemo() = {
+    val df = sc.parallelize(Seq(Student("s1", 12), Student("s2", 18), Student("s3", 11), Student("s3", 15))).toDF().filter($"stuAge">100)
+//    不会报错，因为map里根本没有执行
+    df.map(row => {
+      1/0
+    }).show()
+  }
+
+  @Test
   def lazyDemoWithLimit() = {
     // 这种情形，在local模式不会出现异常，但是在集群模式下，下面的几个persist之前的show的结果是有可能不同的，因为每次show，之前的这些操作都会重新跑一次，那由于limit的存在，不一定最后返回的是谁
     var studentSeq: mutable.Seq[Student] = mutable.Seq()
