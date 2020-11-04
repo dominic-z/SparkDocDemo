@@ -25,9 +25,11 @@
     </properties>
 
     <dependencies>
-<!--        进行了一定的更改，原本需要idea手动为project导入一个scala作为编译环境，现在改为利用maven插件scala-maven-plugin来导入scala编译器-->
-<!--        当pom中只有这个插件的时候，project里会有一个单独的scala-lang这个依赖，因此scala-maven-plugin这个插件的原理与手动导入的原理相同-->
-<!--        但是下面这些spark依赖也会导入相应的scala-lang依赖，会将scala-maven-plugin导入的scala-lang覆盖掉，但这些spark依赖带来的scala-lang不会作为编译环境使用，因此要做exclusion-->
+        <!--        进行了一定的更改，原本需要idea手动为project导入一个scala作为编译环境，现在改为利用maven插件scala-maven-plugin来导入scala编译器-->
+        <!--        当pom中只有这个插件的时候，project里会有一个单独的scala-lang这个依赖，因此scala-maven-plugin这个插件的原理与手动导入的原理相同-->
+        <!--        但是下面这些spark依赖也会导入相应的scala-lang依赖，会将scala-maven-plugin导入的scala-lang覆盖掉，但这些spark依赖带来的scala-lang不会作为编译环境使用，因此要做exclusion-->
+        <!--                   不过后面那个插件编译器和idea的集成不太好，有时候难以保证scala-lang由最后的plugin提供，有时候无法被idea识别为编译器 最靠谱的方法是手动添加-->
+        <!--                不识别的解决方案包括重新导入、将由其他spark提供的scala-lang给exclude掉-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
@@ -63,12 +65,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.scala-lang/scala-library &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.scala-lang</groupId>-->
-<!--            <artifactId>scala-library</artifactId>-->
-<!--            <version>${scala.version}</version>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.scala-lang/scala-library &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.scala-lang</groupId>-->
+        <!--            <artifactId>scala-library</artifactId>-->
+        <!--            <version>${scala.version}</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>

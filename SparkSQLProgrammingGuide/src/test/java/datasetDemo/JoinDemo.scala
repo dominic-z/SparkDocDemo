@@ -4,8 +4,10 @@ import cases.{Person, Student, StudentScore}
 import gettingStarted.Employee
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.junit.Test
+
 
 /**
  * @author dominiczhu
@@ -62,6 +64,18 @@ class JoinDemo {
     leftDS.join(rightEmpDS,Seq("name")).show()
     rightEmpDS.join(leftDS,Seq("name")).show()//观察顺序可以发现，join的列会在最前面，然后是左表然后是右表
     println("")
+  }
+
+  @Test
+  def joinWithDifferentType():Unit={
+    /*
+    * 类型不同也可以join
+    * */
+    val leftDS = Seq(Person("32", 1), Person("12", 3)).toDS()
+
+    val rightDS = Seq(Student("Andy", 32), Student(null, 12)).toDS()
+    val resDf = leftDS.join(rightDS, $"name" <=> $"stuAge")
+    resDf.show()
   }
 
   /**
