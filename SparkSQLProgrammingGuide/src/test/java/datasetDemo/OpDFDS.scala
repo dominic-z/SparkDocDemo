@@ -32,6 +32,14 @@ class OpDFDS {
   }
 
   @Test
+  def DfWithSameColumnsName():Unit={
+    val df=sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f1", "f1")
+    df.map(row=>{
+      row.getAs[Int]("f1") // 如果有多个相同名称的列，使用row.get的话会取相同名称之中最后一个出现的
+    }).show()
+  }
+
+  @Test
   def testSql():Unit={
     val df = sc.parallelize(Seq((4L, 5d, 6,"a","1"))).toDF()
     df.where($"_5"===1).show()
@@ -95,8 +103,8 @@ class OpDFDS {
       val f3Null = row.getAs[Any]("f3")
       println("f3Null", f3Null)
       val f3GetAsName = row.getAs[Int]("f3")
-      println("f3GetAsName", f3GetAsName)// 也就是说如果直接取值赋值，那结果解释0
-      println("what the fuck?", row.getAs[Int]("f3"))  //但如果直接打印，实际上返回的null
+      println("f3GetAsName", f3GetAsName)// 也就是说如果直接取值赋值打印，那结果为0 这是因为For primitive types if value is null it returns 'zero value' specific for primitive
+      println("what the fuck?", row.getAs[Int]("f3"))  //但如果直接打印，实际上返回的null 也就是说，实际上返回的是null，我猜是做了隐式转换
 
       val f3GetAsI = row.getAs[Int](2)
       println("f3GetAsI", f3GetAsI)
@@ -228,6 +236,12 @@ class OpDFDS {
     })
     shown.show()
 
+  }
+
+  @Test
+  def dsAlsoCanAgg():Unit={
+    val df = sc.parallelize(Seq(Student("s1", 11), Student("s2", 200), Student("s3", 120),Student("s4", 220),Student("s4", 1200))).toDS()
+    df.agg(sum("stuAge")).show()
   }
 
   @Test
