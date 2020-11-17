@@ -17,7 +17,7 @@ object CreateFileDemo {
 
   def createHdfsFile(): Unit = {
     val path = new Path("hdfs://xxx/xxx")
-    val hdfs = FileSystem.get(path.toUri, new org.apache.hadoop.conf.Configuration())
+    val hdfs = FileSystem.get(path.toUri, sc.hadoopConfiguration)
     var outputStream:FSDataOutputStream=null
     try {
       outputStream=hdfs.create(path, false)

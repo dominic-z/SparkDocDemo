@@ -1,8 +1,8 @@
 package hdfs
 
 import org.apache.hadoop.fs.Path
-import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * @author dominiczhu
@@ -15,7 +15,7 @@ class DeleteFileDemo {
 
   def deleteHdfsFile(): Unit = {
     val path = new Path("hdfs://xxx/xxx")
-    val hdfs = org.apache.hadoop.fs.FileSystem.get(path.toUri,new org.apache.hadoop.conf.Configuration())
+    val hdfs = org.apache.hadoop.fs.FileSystem.get(path.toUri,sc.hadoopConfiguration)
     if (hdfs.exists(path)) hdfs.delete(path, true)
   }
 }
