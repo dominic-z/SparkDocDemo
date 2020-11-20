@@ -10,7 +10,7 @@ import org.apache.spark.sql.SparkSession
  * @author dominiczhu
  * @date 2020/11/17 下午7:47
  */
-object CreateFileDemo {
+class CreateFileDemo {
   implicit val sparkConf = new SparkConf().setAppName("local").setMaster("local[5]")
   implicit val sc = new SparkContext(sparkConf)
   implicit val spark = SparkSession.builder().config(sparkConf).getOrCreate()
