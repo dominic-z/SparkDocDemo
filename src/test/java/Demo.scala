@@ -8,14 +8,13 @@ class Demo {
 
   @Test
   def demo(): Unit = {
-    println("%s".format(19))
+    var (a,b)=func()
+    a=false
+    println(a)
+    println(b)
   }
-  def func():Boolean={
-    for(i<-Array(1,2,3,4)){
-      if(i>3)
-        return true
-    }
-    false
+  def func():(Boolean,Int)={
+    (true,1)
   }
 
 }
