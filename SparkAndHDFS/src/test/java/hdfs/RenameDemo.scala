@@ -34,17 +34,14 @@ class RenameDemo {
   }
 
 
-  //  以下行为是在公司内集群测得的
+  //  以下行为是在公司内集群测得的 其实rename就是mv，操作结果和mv一模一样 规则也一样
   val dirForRenamePath = "hdfs://xxx"
   val fileForRenamePath = "hdfs://xxx"
 
-  //  * <li>Fails if src is a file and dst is a directory.
-  //  * <li>Fails if src is a directory and dst is a file.
-  //    * <li>Fails if the parent of dst does not exist or is a file.
   //  将文件夹挪到一个不存在的文件夹里面会失败
   def renameDirIntoDoesntExistDir()(implicit sc: SparkContext, spark: SparkSession): Unit = {
     val srcDir = new Path(dirForRenamePath)
-    val dstDirPath = "hdfs://ss-teg-4-v2/user/tdw_dominiczhu/work/learn/tdw_spark_demo/doesnt_exist_dir_for_dir/dst_dir"
+    val dstDirPath = "hdfs://xxx"
     val dstDir = new Path(dstDirPath)
     val fs = FileSystem.get(srcDir.toUri, sc.hadoopConfiguration)
 
@@ -54,7 +51,7 @@ class RenameDemo {
   //  将文件挪到一个不存在的文件夹里面会失败
   def renameFileIntoDoesntExistDir()(implicit sc: SparkContext, spark: SparkSession): Unit = {
     val srcFile = new Path(fileForRenamePath)
-    val dstFilePath = "hdfs://ss-teg-4-v2/user/tdw_dominiczhu/work/learn/tdw_spark_demo/doesnt_exist_dir_for_file/dst_file"
+    val dstFilePath = "hdfs://xxx"
     val dstDir = new Path(dstFilePath)
     val fs = FileSystem.get(srcFile.toUri, sc.hadoopConfiguration)
     println(s"success: ${fs.rename(srcFile, dstDir)}")
@@ -64,7 +61,7 @@ class RenameDemo {
   //  将文件夹挪到一个已经存在的文件夹，会导致源文件夹被挪动到目标文件夹里面
   def renameDirToExistDir()(implicit sc: SparkContext, spark: SparkSession): Unit = {
     val srcDir = new Path(dirForRenamePath)
-    val dstDirPath = "hdfs://ss-teg-4-v2/user/tdw_dominiczhu/work/learn/tdw_spark_demo/exist_dir"
+    val dstDirPath = "hdfs://xxx"
     val dstDir = new Path(dstDirPath)
     val fs = FileSystem.get(srcDir.toUri, sc.hadoopConfiguration)
     println(s"success: ${fs.rename(srcDir, dstDir)}")
@@ -73,7 +70,7 @@ class RenameDemo {
   //  将文件夹挪到一个不存在的文件夹(父目录存在)，会成功
   def renameDirToDosentExistDir()(implicit sc: SparkContext, spark: SparkSession): Unit = {
     val srcDir = new Path(dirForRenamePath)
-    val dstDirPath = "hdfs://ss-teg-4-v2/user/tdw_dominiczhu/work/learn/tdw_spark_demo/doesnt_exist_dir"
+    val dstDirPath = "hdfs://xxx"
     val dstDir = new Path(dstDirPath)
     val fs = FileSystem.get(srcDir.toUri, sc.hadoopConfiguration)
     println(s"success: ${fs.rename(srcDir, dstDir)}")
@@ -82,7 +79,16 @@ class RenameDemo {
   //  将文件挪到一个已经存在的文件，会失败
   def renameFileToExistFile()(implicit sc: SparkContext, spark: SparkSession): Unit = {
     val srcFile = new Path(fileForRenamePath)
-    val dstFilePath = "hdfs://ss-teg-4-v2/user/tdw_dominiczhu/work/learn/tdw_spark_demo/exist_file"
+    val dstFilePath = "hdfs://xxx"
+    val dstDir = new Path(dstFilePath)
+    val fs = FileSystem.get(srcFile.toUri, sc.hadoopConfiguration)
+    println(s"success: ${fs.rename(srcFile, dstDir)}")
+  }
+
+  //  将文件挪到一个已经存在的文件 会成功
+  def renameFileIntoExistDir()(implicit sc: SparkContext, spark: SparkSession): Unit = {
+    val srcFile = new Path(fileForRenamePath)
+    val dstFilePath = "hdfs://xxx"
     val dstDir = new Path(dstFilePath)
     val fs = FileSystem.get(srcFile.toUri, sc.hadoopConfiguration)
     println(s"success: ${fs.rename(srcFile, dstDir)}")
