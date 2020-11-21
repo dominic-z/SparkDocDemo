@@ -1,3 +1,4 @@
+import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
@@ -20,4 +21,13 @@ class OpRDD {
 
     println(rdd.reduceByKey((a,b)=>a+b).collect().toSeq)
   }
+
+  @Test
+  def unionEmptyRddArray():Unit={
+//    不会报错
+    val arr=Array[RDD[String]]()
+    println(sc.union(arr).collect().mkString(","))
+  }
+
+
 }
