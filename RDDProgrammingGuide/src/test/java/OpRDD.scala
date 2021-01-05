@@ -29,5 +29,12 @@ class OpRDD {
     println(sc.union(arr).collect().mkString(","))
   }
 
+  @Test
+  def mapDemo():Unit={
+    val data = Array((1,1), (2,2), (1,3))
+    val rdd = sc.parallelize(data).map((_,1))
+    println(rdd.collect().toSeq)
+  }
+
 
 }

@@ -16,8 +16,25 @@ class RDDSaveDemo {
   @Test
   def textFileEmptyDir(): Unit = {
     //    如果目标文件夹已经存在，那么就会报错
-    val dir="fake_hdfs/saveAsText"
-    val rdd=sc.parallelize(Array.range(0,10))
+    val dir = "fake_hdfs/saveAsText"
+    val rdd = sc.parallelize(Array.range(0, 10))
+    rdd.saveAsTextFile(dir)
+  }
+
+  @Test
+  def saveEmptyRDD(): Unit = {
+    //    如果目标文件夹已经存在，那么就会报错
+    val dir = "fake_hdfs/save_empty_rdd_as_text"
+    val rdd = sc.parallelize(Array.range(0, 10)).filter(_ < 0)
+    rdd.saveAsTextFile(dir)
+  }
+
+
+  @Test
+  def saveEmptyRddAsTextFile(): Unit = {
+    //    如果目标文件夹已经存在，那么就会报错
+    val dir = "fake_hdfs/saveEmptyRddAsText"
+    val rdd = sc.textFile("fake_hdfs/empty.txt")
     rdd.saveAsTextFile(dir)
   }
 }
