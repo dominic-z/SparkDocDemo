@@ -23,6 +23,7 @@ object ClassificationMain {
       StructField("class", StringType, true)))
     val rawInput = spark.read.schema(schema).csv("XGBoost/data/iris.csv")
 
+    // 下面这个类的功能是将某一个列（string）改成label，例如，把"a"变成1.0，"b"变成2.0
     val stringIndexer = new StringIndexer().
       setInputCol("class").
       setOutputCol("classIndex").
@@ -31,6 +32,7 @@ object ClassificationMain {
 
     labelTransformed.show(10)
 
+    // 下面这个类的功能是将featureDF的多个列合并成一个列，这个列里的对象是Vector
     val vectorAssembler = new VectorAssembler().
       setInputCols(Array("sepal length", "sepal width", "petal length", "petal width")).
       setOutputCol("features")
