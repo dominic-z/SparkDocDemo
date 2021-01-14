@@ -17,30 +17,45 @@ class CreateFileDemo {
   implicit val spark = SparkSession.builder().config(sparkConf).getOrCreate()
 
   @Test
-  def createEmptyFile():Unit={
+  def createEmptyFile(): Unit = {
     val hdfs = FileSystem.get(sc.hadoopConfiguration)
     hdfs.create(new Path("fake_hdfs/_SUCCESS"))
   }
 
   @Test
-  def createFileInDosentExistDir():Unit={
-//    集群测试，会自动创建父目录，如果父目录不存在的话
+  def writeToFile(): Unit = {
+    val hdfs = FileSystem.get(sc.hadoopConfiguration)
+    val outputStream = hdfs.create(new Path("fake_hdfs/write_file"))
+    outputStream.writeBytes("write")
+    outputStream.close() // 要先close这个outputStream，如果先close fs，写入不会成功
+    hdfs.close()
+
+    val hdfs2 = FileSystem.get(sc.hadoopConfiguration)
+    val outputStream2 = hdfs2.create(new Path("fake_hdfs/write_file"))
+    outputStream2.writeBytes("write2")
+    outputStream2.close() // 要先close这个outputStream，如果先close fs，写入不会成功
+    hdfs2.close()
+  }
+
+  @Test
+  def createFileInDosentExistDir(): Unit = {
+    //    集群测试，会自动创建父目录，如果父目录不存在的话
     val path = new Path("fake_hdfs/doesnt_exist_dir/create_empty_file")
-    val hdfs = FileSystem.get(path.toUri,sc.hadoopConfiguration)
+    val hdfs = FileSystem.get(path.toUri, sc.hadoopConfiguration)
     hdfs.create(path)
   }
 
   def createHdfsFile(): Unit = {
     val path = new Path("hdfs://xxx/xxx")
     val hdfs = FileSystem.get(path.toUri, sc.hadoopConfiguration)
-    var outputStream:FSDataOutputStream=null
+    var outputStream: FSDataOutputStream = null
     try {
-      outputStream=hdfs.create(path, false)
+      outputStream = hdfs.create(path, false)
       outputStream.writeUTF("Hei there")
     } catch {
       case _: IOException =>
         println("file already exists")
-    }finally {
+    } finally {
       outputStream.close()
     }
   }

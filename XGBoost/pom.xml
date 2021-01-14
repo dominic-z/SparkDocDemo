@@ -11,7 +11,8 @@
 
     <artifactId>XGBoost</artifactId>
     <properties>
-        <xgb-version>1.2.0</xgb-version>
+        <xgb.version>1.2.0</xgb.version>
+<!--        注意去maven中央仓库查询scala版本和xgb版本的关系-->
         <scala.binary.version>2.12</scala.binary.version>
     </properties>
 
@@ -21,7 +22,7 @@
         <dependency>
             <groupId>ml.dmlc</groupId>
             <artifactId>xgboost4j-spark_${scala.binary.version}</artifactId>
-            <version>${xgb-version}</version>
+            <version>${xgb.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.scala-lang</groupId>
@@ -34,7 +35,7 @@
         <dependency>
             <groupId>ml.dmlc</groupId>
             <artifactId>xgboost4j_${scala.binary.version}</artifactId>
-            <version>${xgb-version}</version>
+            <version>${xgb.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.scala-lang</groupId>
