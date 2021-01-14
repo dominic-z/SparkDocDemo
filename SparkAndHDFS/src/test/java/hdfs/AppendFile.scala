@@ -21,7 +21,7 @@ class AppendFile {
 
   @Test
   def appendStr(): Unit = {
-    val logFile = new Path("hdfs://xxx")
+    val logFile = new Path("fake_hdfs/append_file")
     val fs = FileSystem.get(logFile.toUri, sc.hadoopConfiguration)
     if (!fs.exists(logFile))
       fs.create(logFile).close()
@@ -29,6 +29,7 @@ class AppendFile {
     // 将字符串变成流，然后新增到目标hdfs
     val inputStream = commons.io.IOUtils.toInputStream(s"${new Date()}, aaaaa\n", StandardCharsets.UTF_8)
     val outputStream = fs.append(logFile)
+//    val outputStream = fs.create(logFile) // 用create的也可
     hadoop.io.IOUtils.copyBytes(inputStream, outputStream, 4096, true)
   }
 
