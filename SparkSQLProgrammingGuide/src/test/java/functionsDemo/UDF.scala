@@ -1,20 +1,24 @@
 package functionsDemo
+
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.udf
 import org.junit.Test
+
 /**
  * @author dominiczhu
  * @date 2020/9/19 4:22 下午
- *      Test文件读取的基本路径是本model，而不是外面的project
+ *       Test文件读取的基本路径是本model，而不是外面的project
  */
 class UDF {
   val sparkConf: SparkConf = new SparkConf().setAppName("local").setMaster("local[2]")
   val sc: SparkContext = new SparkContext(sparkConf)
   val spark: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
+
   import spark.implicits._
+
   @Test
-  def udfDocDemo():Unit={
+  def udfDocDemo(): Unit = {
     // Define and register a zero-argument non-deterministic UDF
     // UDF is deterministic by default, i.e. produces the same result for the same input.
     val random = udf(() => Math.random())
@@ -46,7 +50,9 @@ class UDF {
     // +--------------------+
 
     // UDF in a WHERE clause
-    spark.udf.register("oneArgFilter", (n: Int) => { n > 5 })
+    spark.udf.register("oneArgFilter", (n: Int) => {
+      n > 5
+    })
     spark.range(1, 10).createOrReplaceTempView("test")
     spark.sql("SELECT * FROM test WHERE oneArgFilter(id)").show()
     // +---+
@@ -61,10 +67,12 @@ class UDF {
   }
 
   @Test
-  def useUdf():Unit={
+  def useUdf(): Unit = {
     val df = spark.read.json("employeesForUdf.json")
     val addOneColumn = udf((x: Int) => x + 1)
-    df.select($"name",$"salary",addOneColumn($"salary").as("salaryPlus1")).show()
-    df.withColumn("salaryPlus1",addOneColumn($"salary")).show()
+    val addConst = udf(() => 1)
+    df.select($"name", $"salary", addOneColumn($"salary").as("salaryPlus1")).show()
+    df.withColumn("salaryPlus1", addOneColumn($"salary")).show()
+    df.withColumn("const", addConst()).show()
   }
 }
