@@ -2,8 +2,9 @@ package datasetDemo
 
 import cases.{Employer, Person, Student, StudentScore}
 import org.apache.commons.lang3.RandomStringUtils
-import org.apache.spark.sql.{SparkSession, TypedColumn}
+import org.apache.spark.sql.{Row, SparkSession, TypedColumn}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.Test
 
@@ -88,6 +89,36 @@ class OpDFDS {
   }
 
   @Test
+  def createEmptyDf():Unit={
+    /**
+     * 创建一个空的DataFrame，代表用户
+     * 有四列，分别代表ID、名字、年龄、生日
+     */
+    val colNames = Array("id", "name", "age", "birth")
+    //为了简单起见，字段类型都为String
+    val schema = StructType(colNames.map(fieldName => StructField(fieldName, StringType, true)))
+    //主要是利用了spark.sparkContext.emptyRDD
+    val emptyDf = spark.createDataFrame(sc.emptyRDD[Row], schema)
+
+    emptyDf.show
+
+    /**
+     * 也可以给每列指定相对应的类型
+     */
+    val schema1 = StructType(
+      Seq(
+        StructField("id", IntegerType, true),
+        StructField("name", StringType, true),
+        StructField("age", IntegerType, true),
+        StructField("birth", StringType, true)))
+    val emptyDf1 = spark.createDataFrame(sc.emptyRDD[Row], schema1)
+    emptyDf1.show
+
+    //还有一种空的DataFrame，没有任何行任何列
+    spark.emptyDataFrame.show
+  }
+
+  @Test
   def select():Unit={
     val rdd = sc.parallelize(Seq(Student("person", 13), Student("student", 12)))
     val df = rdd.toDF()
@@ -166,13 +197,20 @@ class OpDFDS {
   }
 
   @Test
-  def filterDemo() = {
+  def unionEmptyDemo():Unit={
+    val df1 = sc.parallelize(Seq((1, 2, 3), (4, 5, 6))).toDF("a","b","c")
+    val emptyDf=spark.emptyDataFrame
+    df1.union(emptyDf).show()
+  }
+
+  @Test
+  def filterDemo(): Unit = {
     val ds = sc.parallelize(Seq(Student("s1", 12), Student("s2", 12), Student("s3", 12))).toDS()
     val res = ds.filter("stuName in ('s1','s2')").filter("stuName='s2'")
     res.show()
   }
   @Test
-  def otherOperations() = {
+  def otherOperations(): Unit = {
     val df = sc.parallelize(Seq(Employer("s1", "xian", 1, 3000), Employer("s2", null, 1, 5000), Employer(null, "shagnhai", 0, 9000), Employer(null, null, 0, 1000))).toDF()
     df.na.fill("NA", Seq("name")).show()
     df.na.fill(Map("name" -> "emptyName", "city" -> "emptyCity")).show()
@@ -181,7 +219,7 @@ class OpDFDS {
     df.na.replace(Seq("name", "city"), Map("s1" -> "s", "s2" -> "ss", "xian" -> "Xian")).show()
   }
   @Test
-  def mapDemo() = {
+  def mapDemo(): Unit = {
     val df = sc.parallelize(Seq(Student("s1", 12), Student("s2", 18), Student("s3", 11), Student("s3", 15))).toDF()
     df.map(row => {
       row.getString(0)
@@ -204,7 +242,7 @@ class OpDFDS {
   }
 
   @Test
-  def mapWithEmptyDemo() = {
+  def mapWithEmptyDemo(): Unit = {
     val df = sc.parallelize(Seq(Student("s1", 12), Student("s2", 18), Student("s3", 11), Student("s3", 15))).toDF().filter($"stuAge">100)
 //    不会报错，因为map里根本没有执行
     df.map(row => {
@@ -213,7 +251,7 @@ class OpDFDS {
   }
 
   @Test
-  def lazyDemoWithLimit() = {
+  def lazyDemoWithLimit(): Unit = {
     // 这种情形，在local模式不会出现异常，但是在集群模式下，下面的几个persist之前的show的结果是有可能不同的，因为每次show，之前的这些操作都会重新跑一次，那由于limit的存在，不一定最后返回的是谁
     var studentSeq: mutable.Seq[Student] = mutable.Seq()
     for (age <- Array.range(20, 40)) {
