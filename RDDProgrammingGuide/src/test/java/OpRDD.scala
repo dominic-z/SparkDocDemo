@@ -36,5 +36,19 @@ class OpRDD {
     println(rdd.collect().toSeq)
   }
 
+  @Test
+  def mapReturnAnyDemo():Unit={
+    // 会报错，
+    val data = Array((1,1), (2,2), (1,3))
+    val rdd = sc.parallelize(data).map(t=>{
+      val v1=t._1
+      if(v1==1)
+        "1"
+      else
+        v1
+    })
+    println(rdd.collect().toSeq)
+  }
+
 
 }
