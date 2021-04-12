@@ -89,6 +89,9 @@ class JoinDemo {
     val rightDS = Seq(Student("Andy", 32), Student(null, 35)).toDS()
     val resDf = leftDS.join(rightDS, $"name" <=> $"stuName")
     resDf.show()
+
+    val resDf2 = leftDS.join(rightDS, $"name" === $"stuName")// 忽略了null
+    resDf2.show()
   }
 
   @Test
