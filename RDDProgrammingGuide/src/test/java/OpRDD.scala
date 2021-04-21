@@ -15,34 +15,34 @@ class OpRDD {
 
   @Test
   def emptyRddReduceByKey(): Unit = {
-    val data = Array((1,1), (2,2), (1,3))
-    val rdd = sc.parallelize(data).filter(t=>t._1<0)
+    val data = Array((1, 1), (2, 2), (1, 3))
+    val rdd = sc.parallelize(data).filter(t => t._1 < 0)
     println(rdd.collect().toSeq)
 
-    println(rdd.reduceByKey((a,b)=>a+b).collect().toSeq)
+    println(rdd.reduceByKey((a, b) => a + b).collect().toSeq)
   }
 
   @Test
-  def unionEmptyRddArray():Unit={
-//    不会报错
-    val arr=Array[RDD[String]]()
+  def unionEmptyRddArray(): Unit = {
+    //    不会报错
+    val arr = Array[RDD[String]]()
     println(sc.union(arr).collect().mkString(","))
   }
 
   @Test
-  def mapDemo():Unit={
-    val data = Array((1,1), (2,2), (1,3))
-    val rdd = sc.parallelize(data).map((_,1))
+  def mapDemo(): Unit = {
+    val data = Array((1, 1), (2, 2), (1, 3))
+    val rdd = sc.parallelize(data).map((_, 1))
     println(rdd.collect().toSeq)
   }
 
   @Test
-  def mapReturnAnyDemo():Unit={
+  def mapReturnAnyDemo(): Unit = {
     // 会报错，
-    val data = Array((1,1), (2,2), (1,3))
-    val rdd = sc.parallelize(data).map(t=>{
-      val v1=t._1
-      if(v1==1)
+    val data = Array((1, 1), (2, 2), (1, 3))
+    val rdd = sc.parallelize(data).map(t => {
+      val v1 = t._1
+      if (v1 == 1)
         "1"
       else
         v1
@@ -51,4 +51,16 @@ class OpRDD {
   }
 
 
+  @Test
+  def sampleByKeyDemo(): Unit = {
+    val data = Array((1, 1), (2, 2), (1, 3))
+    val rdd = sc.parallelize(data)
+
+    val fractionMap = Map((1, 0.3d), (2, 3d))
+
+    // 大于1都会被视为1
+    val res = rdd.sampleByKey(withReplacement = false, fractions = fractionMap)
+    println(res.collect().toSeq)
+
+  }
 }
