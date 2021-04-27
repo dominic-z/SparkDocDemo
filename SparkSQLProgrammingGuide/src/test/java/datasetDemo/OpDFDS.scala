@@ -250,13 +250,13 @@ class OpDFDS {
 
     // 会报错的，dataframe里的类型不能包括any，因为下面的map方法里，有可能返回一个int也有可能是一个string，因此会认为是个any类型的对象
     val df = sc.parallelize(Seq(Student("s1", 12), Student("s2", 18), Student("s3", 11), Student("s3", 15))).toDF()
-    df.map(row => {
-      val name=row.getString(0)
-      if(name.equals("s1"))
-        12
-      else
-        name
-    }).show()
+//    df.map(row => {
+//      val name=row.getString(0)
+//      if(name.equals("s1"))
+//        12
+//      else
+//        name
+//    }).show()
 
   }
 

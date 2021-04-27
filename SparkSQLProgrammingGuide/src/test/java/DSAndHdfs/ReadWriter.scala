@@ -9,7 +9,7 @@ import org.junit.Test
  * @author dominiczhu
  * @date 2020/11/21 下午7:48
  */
-class Writer {
+class ReadWriter {
   val sparkConf: SparkConf = new SparkConf().setAppName("local").setMaster("local[2]")
   val sc: SparkContext = new SparkContext(sparkConf)
   val spark: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
@@ -18,5 +18,18 @@ class Writer {
   def json(): Unit = {
     val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
     ds.write.json("data/output/output.json")
+  }
+
+  @Test
+  def csv(): Unit = {
+    val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
+    ds.write.csv("data/output/output.csv")
+  }
+
+  @Test
+  def readCsv(): Unit = {
+//    val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
+    val ds=spark.read.csv("data/output/output.csv")
+    ds.show()
   }
 }
