@@ -36,5 +36,10 @@ class ListDemo {
     while(remoteIterator.hasNext){
       println(remoteIterator.next().getPath)
     }
+    println("=============================")
+    val allRemoteIterator=hdfs.listFiles(new Path("fake_hdfs"),true)
+    while(allRemoteIterator.hasNext){
+      println(allRemoteIterator.next().getPath)
+    }
   }
 }

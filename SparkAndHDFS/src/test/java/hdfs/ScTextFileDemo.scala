@@ -35,4 +35,54 @@ class ScTextFileDemo {
     println(rdd2.collect().mkString(";"))
 
   }
+
+
+  @Test
+  def textFileEmptyDir(): Unit = {
+    //    如果sc来读取文件没有文件match得上，match上，会报错
+    val emptyDirPath = "fake_hdfs/empty_dir"
+    val rdd = sc.textFile(s"${emptyDirPath}/*")
+    println("read empty dir")
+    println(rdd.collect().mkString("\n"))
+  }
+
+  @Test
+  def textFileEmptyDirButADir(): Unit = {
+    //    只要没有text文件match，也会报错
+    val emptyDirPath = "fake_hdfs/empty_dir_but_a_dir"
+    val rdd = sc.textFile(s"${emptyDirPath}/*")
+    println("read empty dir")
+    println(rdd.collect().mkString("\n"))
+  }
+
+
+  @Test
+  def textFileWithADir(): Unit = {
+    //    即使这个文件夹下面有一个文件夹，那textfile也会读取这个文件夹下面的文件。
+    val emptyDirPath = "fake_hdfs/text_file_and_dir"
+    val rdd = sc.textFile(s"${emptyDirPath}/*")
+    println("text_file_and_dir")
+    println(rdd.collect().mkString("\n"))
+  }
+
+
+  @Test
+  def textFileWithADirRecrusive(): Unit = {
+    //    会报错，因为textFile只会搜索一层
+    // 如果textFile的输入是path，那么会读取path下的文件、以及path下一级文件夹里的文件，如果里面再嵌套文件夹，就不行了
+    val recDir = "fake_hdfs"
+    val rdd = sc.textFile(s"${recDir}/*")
+    println("textFileWithADirRecrusive")
+    println(rdd.collect().mkString("\n"))
+  }
+
+
+  @Test
+  def textFileSeveralFile(): Unit = {
+    // 读取多个文件，逗号分隔符
+    val recDir = "fake_hdfs"
+    val rdd = sc.textFile(s"${recDir}/append_file,${recDir}/write_file")
+    println("textFileSeveralFile")
+    println(rdd.collect().mkString("\n"))
+  }
 }
