@@ -83,15 +83,40 @@ class JoinDemo {
    *
    */
   @Test
-  def nullJoin(): Unit = {
-    val leftDS = Seq(Person("Andy", 32), Person("Mike", 32), Person(null, 32)).toDS()
+  def nullInnerJoin(): Unit = {
+    val leftDS = Seq(Person("Andy", 32), Person("Mike", 21), Person(null, 32),Person("John",44)).toDS()
 
     val rightDS = Seq(Student("Andy", 32), Student(null, 35)).toDS()
-    val resDf = leftDS.join(rightDS, $"name" <=> $"stuName")
-    resDf.show()
+    val withNull = leftDS.join(rightDS, $"name" <=> $"stuName")
+    withNull.show()
 
-    val resDf2 = leftDS.join(rightDS, $"name" === $"stuName")// 忽略了null
-    resDf2.show()
+    val ignoreNull = leftDS.join(rightDS, $"name" === $"stuName")// 忽略了null
+    ignoreNull.show()
+
+  }
+
+  /**
+   * 演示如果有列为null的情况下会不会join成功
+   *
+   */
+  @Test
+  def nullLeftJoin(): Unit = {
+    val leftPersonDS = Seq(Person("Andy", 32), Person("Mike", 21), Person(null, 32),Person("John",44)).toDS()
+    val rightPersonDS = Seq(Person("Andy", 32), Person(null, 32),Person("Frady",44)).toDS()
+    val rightStuDS = Seq(Student("Andy", 32), Student(null, 35),Student("Frady", 35)).toDS()
+
+    val joinStuWithNull = leftPersonDS.join(rightStuDS, $"name" <=> $"stuName","left")
+    joinStuWithNull.show()
+
+
+    // leftJoin之中，leftDs的列保留，但是join的两个列之中，两列的null值不会视作相等
+    val joinStuIgnoreNull = leftPersonDS.join(rightStuDS, $"name" === $"stuName","left")
+    joinStuIgnoreNull.show()
+
+    // 同名列join的时候，执行的方式等同于===方式
+    val joinPersonWithNull = leftPersonDS.join(rightPersonDS, Seq("name"),"left")
+    joinPersonWithNull.show()
+
   }
 
   @Test
