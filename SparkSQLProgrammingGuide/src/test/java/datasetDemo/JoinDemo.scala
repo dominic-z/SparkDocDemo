@@ -64,6 +64,11 @@ class JoinDemo {
     leftDS.join(rightEmpDS,Seq("name")).show()
     rightEmpDS.join(leftDS,Seq("name")).show()//观察顺序可以发现，join的列会在最前面，然后是左表然后是右表
     println("")
+
+    leftDS = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
+
+    rightDS = Seq(Student("Andy", 32),Student("Andy", 50)).toDS()
+    leftDS.join(rightDS, $"name" <=> $"stuName").show()
   }
 
   @Test

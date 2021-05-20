@@ -89,7 +89,6 @@ class DecisionTreeDemo {
 
   @Test
   def justDamnFit(): Unit = {
-    //    spark里的这些个模型是一定要被pipeline包起来的
     //    输入进各种模型里特征必须是Vector的，可以是DenseVector也可以是SparseVector，构造方法可以查看api
     val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt")
     val dt = new DecisionTreeClassifier()
@@ -97,15 +96,15 @@ class DecisionTreeDemo {
       .setFeaturesCol("features")
     val pipeline = new Pipeline()
       .setStages(Array(dt))
+    val model = dt.fit(data) // 报错，不可以输入arr
 
-    val model = pipeline.fit(data)
+//    val model = pipeline.fit(data)
     val predictions = model.transform(data)
     predictions.show(10)
   }
 
   @Test
   def modelInputWithArray(): Unit = {
-    //    spark里的这些个模型是一定要被pipeline包起来的
     //    输入进各种模型里特征必须是Vector的，可以是DenseVector也可以是SparseVector，构造方法可以查看api
     val data = spark.read.format("libsvm").load("data/mllib/sample_libsvm_data.txt").map(row => {
       val label = row.getDouble(0)
@@ -116,9 +115,10 @@ class DecisionTreeDemo {
       .setLabelCol("_1")
       .setFeaturesCol("_2")
     val pipeline = new Pipeline()
-      .setStages(Array(dt))
+      .setStages(Array(dt))// 报错，不可以输入arr
 
-    val model = pipeline.fit(data) // 报错，不可以输入arr
+    val model = pipeline.fit(data)
+
     val predictions = model.transform(data)
     predictions.show(10)
   }
