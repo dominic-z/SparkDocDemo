@@ -3,6 +3,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
 
+import scala.util.Random
+
 /**
  * @author dominiczhu
  * @date 2020/11/19 下午2:29
@@ -62,5 +64,15 @@ class OpRDD {
     val res = rdd.sampleByKey(withReplacement = false, fractions = fractionMap)
     println(res.collect().toSeq)
 
+  }
+
+  @Test
+  def sortByDemo(): Unit = {
+    val data = Array.range(0, 10).map(i => (Random.nextFloat(), Random.nextInt(10)))
+    println(data.toSeq)
+    val rdd = sc.parallelize(data)
+
+    // sortBy可以通过修改隐含参数中的ordering来修改对比大小的方式
+    println(rdd.sortBy(t => (t._2,t._1)).zipWithIndex.collect().toSeq)
   }
 }

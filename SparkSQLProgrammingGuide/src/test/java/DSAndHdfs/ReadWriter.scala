@@ -23,13 +23,30 @@ class ReadWriter {
   @Test
   def csv(): Unit = {
     val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
-    ds.write.csv("data/output/output.csv")
+    ds.write.csv("data/output/output_csv")
+  }
+
+  @Test
+  def nullCsv(): Unit = {
+    val ds = Seq(Person("Andy", 32), Person(null, 32)).toDS()
+    ds.write.csv("data/output/null_output_csv")
   }
 
   @Test
   def readCsv(): Unit = {
 //    val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
-    val ds=spark.read.csv("data/output/output.csv")
+    val ds=spark.read.csv("data/output/output_csv")
     ds.show()
+  }
+
+
+  @Test
+  def readNullCsv(): Unit = {
+    //    val ds = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
+    val ds=spark.read.csv("data/output/null_output_csv")
+    ds.collect().foreach(row=>println(row.getString(0))) // 通过csv读取，""代表的是null
+
+    val rdd=sc.textFile("data/output/null_output_csv") // 通过sc读取，""原样读取
+    rdd.collect().foreach(println)
   }
 }
