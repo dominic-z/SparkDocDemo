@@ -104,19 +104,6 @@ class OpDFDS {
   }
 
   @Test
-  def readIntAsString(): Unit = {
-    val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f2", "f3")
-    // error 无法使用getAs[String]读取int
-    //    df.map(row => row.getAs[String]("f1")).show()
-
-    // 可以通过如下方式进行类别转换
-    df.map(row => {
-      val rawF1 = row.get(row.fieldIndex("f1"))
-      rawF1.toString.toFloat
-    }).show()
-  }
-
-  @Test
   def testRowType(): Unit = {
     val df = sc.parallelize(Seq((4L, 5d, 6, "a"))).toDF()
     //    下面四种方法都会报错，因为row的类型只要不匹配，转换都会失败
@@ -135,8 +122,25 @@ class OpDFDS {
     //    df.map(row=>{
     //      row.getLong(2)
     //    }).show()
+
+    // 成功
+    df.map(row => {
+      new java.lang.Long(row.get(2).toString)
+    }).show()
   }
 
+  @Test
+  def testPackageNumber(): Unit = {
+    // 使用java包装类可以使用null
+    val df = sc.parallelize(Seq((4L, 5d, 6, "4"), (4L, 50d, 6, "1"), (4L, 40d, 6, null))).toDF()
+    df.map(row => {
+      val d = if (row.getDouble(1) > 10) null else new java.lang.Double(row.getDouble(1))
+      val d2s = if (row.get(3) == null) null else new java.lang.Double(row.get(3).toString)
+      (d, d2s)
+    })
+      .show()
+
+  }
 
 
   @Test
