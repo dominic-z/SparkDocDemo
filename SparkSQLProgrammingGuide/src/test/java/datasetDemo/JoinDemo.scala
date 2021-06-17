@@ -83,6 +83,15 @@ class JoinDemo {
     resDf.show()
   }
 
+  @Test
+  def joinWithEmptyDs():Unit={
+    val leftDS = Seq(Person("32", 1), Person("12", 3)).filter(_.age>10).toDS()
+
+    val rightDS = Seq(Student("Andy", 32), Student(null, 12)).toDS()
+    val resDf = leftDS.join(rightDS, $"name" <=> $"stuName","left")
+    resDf.show()
+  }
+
   /**
    * 演示如果有列为null的情况下会不会join成功
    *

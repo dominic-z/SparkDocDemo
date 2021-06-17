@@ -3,6 +3,7 @@ package datasetDemo
 import cases.{Person, Student, StudentScore}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.StringType
 import org.junit.Test
 
 /**
@@ -34,8 +35,9 @@ class DsMetaInfo {
     val schema = ds.schema
     println(schema)
 
-    println("============show struct==============")
-    println(schema.fields)
+    println("============show fields==============")
+    println(schema.fields.toSeq)
+    println(schema.fields(0).dataType == StringType)
 
     schema.foreach(struct => println(struct.name))
   }

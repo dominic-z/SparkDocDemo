@@ -22,52 +22,17 @@ class OpDFDS {
 
   import spark.implicits._
 
+  // CRUD的C
   @Test
   def createDsWithSeq(): Unit = {
     val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f2", "f3")
+    sc.parallelize(Seq[(String, String)]()).toDF("f1", "f2").show()
   }
 
   @Test
   def createDsWithTuple(): Unit = {
     val rdd = sc.parallelize(Seq((Person("person", 12L), Student("student", 12)))) //这种情况里表头是_1,_2，因为传入的是tuple
     rdd.toDS().show()
-  }
-
-  @Test
-  def DfWithSameColumnsName(): Unit = {
-    val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f1", "f1")
-    df.map(row => {
-      row.getAs[Int]("f1") // 如果有多个相同名称的列，使用row.get的话会取相同名称之中最后一个出现的
-    }).show()
-  }
-
-  @Test
-  def testSql(): Unit = {
-    val df = sc.parallelize(Seq((4L, 5d, 6, "a", "1"))).toDF()
-    df.where($"_5" === 1).show()
-    df.where($"_5" equalTo (1)).show()
-    df.where($"_5" equalTo (1)).show()
-  }
-
-  @Test
-  def testRowType(): Unit = {
-    val df = sc.parallelize(Seq((4L, 5d, 6, "a"))).toDF()
-    //    下面四种方法都会报错，因为row的类型只要不匹配，转换都会失败
-    //    df.map(row=>{
-    //      row.getAs[Double](0)
-    //    }).show()
-
-    //    df.map(row=>{
-    //      row.getAs[Double](2)
-    //    }).show()
-
-    //    df.map(row=>{
-    //      row.getAs[Long](2)
-    //    }).show()
-
-    //    df.map(row=>{
-    //      row.getLong(2)
-    //    }).show()
   }
 
   @Test
@@ -119,6 +84,60 @@ class OpDFDS {
     //还有一种空的DataFrame，没有任何行任何列
     spark.emptyDataFrame.show
   }
+
+
+  // CRUD 的R
+  @Test
+  def DfWithSameColumnsName(): Unit = {
+    val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f1", "f1")
+    df.map(row => {
+      row.getAs[Int]("f1") // 如果有多个相同名称的列，使用row.get的话会取相同名称之中最后一个出现的
+    }).show()
+  }
+
+  @Test
+  def testSql(): Unit = {
+    val df = sc.parallelize(Seq((4L, 5d, 6, "a", "1"))).toDF()
+    df.where($"_5" === 1).show()
+    df.where($"_5" equalTo (1)).show()
+    df.where($"_5" equalTo (1)).show()
+  }
+
+  @Test
+  def readIntAsString(): Unit = {
+    val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f2", "f3")
+    // error 无法使用getAs[String]读取int
+    //    df.map(row => row.getAs[String]("f1")).show()
+
+    // 可以通过如下方式进行类别转换
+    df.map(row => {
+      val rawF1 = row.get(row.fieldIndex("f1"))
+      rawF1.toString.toFloat
+    }).show()
+  }
+
+  @Test
+  def testRowType(): Unit = {
+    val df = sc.parallelize(Seq((4L, 5d, 6, "a"))).toDF()
+    //    下面四种方法都会报错，因为row的类型只要不匹配，转换都会失败
+    //    df.map(row=>{
+    //      row.getAs[Double](0)
+    //    }).show()
+
+    //    df.map(row=>{
+    //      row.getAs[Double](2)
+    //    }).show()
+
+    //    df.map(row=>{
+    //      row.getAs[Long](2)
+    //    }).show()
+
+    //    df.map(row=>{
+    //      row.getLong(2)
+    //    }).show()
+  }
+
+
 
   @Test
   def select(): Unit = {
@@ -250,13 +269,13 @@ class OpDFDS {
 
     // 会报错的，dataframe里的类型不能包括any，因为下面的map方法里，有可能返回一个int也有可能是一个string，因此会认为是个any类型的对象
     val df = sc.parallelize(Seq(Student("s1", 12), Student("s2", 18), Student("s3", 11), Student("s3", 15))).toDF()
-//    df.map(row => {
-//      val name=row.getString(0)
-//      if(name.equals("s1"))
-//        12
-//      else
-//        name
-//    }).show()
+    //    df.map(row => {
+    //      val name=row.getString(0)
+    //      if(name.equals("s1"))
+    //        12
+    //      else
+    //        name
+    //    }).show()
 
   }
 
