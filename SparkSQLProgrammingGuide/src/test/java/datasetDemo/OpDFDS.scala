@@ -1,5 +1,7 @@
 package datasetDemo
 
+import java.lang.reflect.Method
+
 import cases.{Employer, Person, Student, StudentScore}
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.sql.{Row, SparkSession, TypedColumn}
@@ -87,12 +89,21 @@ class OpDFDS {
 
 
   // CRUD 的R
+
+  @Test
+  def showDS(): Unit = {
+    val df = sc.parallelize(Seq(Employer("A", "SZ", 6, 2D), Employer("B", "BX", 50, 6D), Employer("C", null, 6, 3D))).toDF()
+    df.show()
+    df.take(20).foreach(row => println(row.mkString("(", ",", ")")))
+  }
+
   @Test
   def DfWithSameColumnsName(): Unit = {
     val df = sc.parallelize(Seq((4, 5, 6))).toDF("f1", "f1", "f1")
     df.map(row => {
       row.getAs[Int]("f1") // 如果有多个相同名称的列，使用row.get的话会取相同名称之中最后一个出现的
     }).show()
+
   }
 
   @Test

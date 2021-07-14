@@ -2,7 +2,7 @@ package functionsDemo
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.functions._
 import org.junit.Test
 
 /**
@@ -74,5 +74,18 @@ class UDF {
     df.select($"name", $"salary", addOneColumn($"salary").as("salaryPlus1")).show()
     df.withColumn("salaryPlus1", addOneColumn($"salary")).show()
     df.withColumn("const", addConst()).show()
+  }
+
+  @Test
+  def litDemo(): Unit = {
+    val df = spark.read.json("employeesForUdf.json")
+    val withNull = df.withColumn("null_col", lit(null))
+    withNull.collect().foreach(row => {
+      val str = row.getAs[String]("null_col")
+      println(str == null)
+      println(str)
+    })
+    withNull.show()
+    println(withNull.schema.treeString)
   }
 }
