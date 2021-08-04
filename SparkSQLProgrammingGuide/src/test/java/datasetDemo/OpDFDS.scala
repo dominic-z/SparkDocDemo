@@ -87,6 +87,13 @@ class OpDFDS {
     spark.emptyDataFrame.show
   }
 
+  @Test
+  def createDFWithOneField():Unit={
+    val df = sc.parallelize(Seq("abc","def")).toDF("id")
+    df.show()
+
+  }
+
 
   // CRUD 的R
 
