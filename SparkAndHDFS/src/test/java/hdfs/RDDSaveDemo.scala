@@ -1,8 +1,9 @@
 package hdfs
 
 import org.apache.hadoop.io.{IntWritable, LongWritable, NullWritable, Text}
-import org.apache.hadoop.mapred.TextInputFormat
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
+import org.apache.hadoop.mapred
+import org.apache.hadoop.mapreduce.lib.input
+import org.apache.hadoop.mapreduce.lib.output
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 import org.junit.Test
@@ -19,22 +20,29 @@ class RDDSaveDemo {
   @Test
   def saveAsHadoopFile():Unit={
 
-    // write
+    // 新api write
     val pairRDD = sc.parallelize(Seq((1,"嘿,1"),(2,"你好,2")))
 
     val hadoopRDD = pairRDD.map(t=>{
       (new IntWritable(t._1),new Text(t._2.getBytes("GBK")))
     })
-    hadoopRDD.saveAsNewAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[IntWritable],classOf[Text],classOf[TextOutputFormat[IntWritable, Text]])
+    hadoopRDD.saveAsNewAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[IntWritable],classOf[Text],classOf[output.TextOutputFormat[IntWritable, Text]])
 
     // read
-    sc.hadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[TextInputFormat],classOf[LongWritable],classOf[Text])
+    sc.hadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[mapred.TextInputFormat],classOf[LongWritable],classOf[Text])
       .map(t=>{
         (t._1.get(),new String(t._2.getBytes,0,t._2.getLength,"GBK"))
       })
       .collect()
       .foreach(println(_))
 
+    // 新api
+    sc.newAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[input.TextInputFormat],classOf[LongWritable],classOf[Text])
+      .map(t=>{
+        (t._1.get(),new String(t._2.getBytes,0,t._2.getLength,"GBK"))
+      })
+      .collect()
+      .foreach(println(_))
   }
 
 
