@@ -343,6 +343,15 @@ class OpDFDS {
   }
 
   @Test
+  def aggAndAsOtherCol():Unit={
+    val df = sc.parallelize(Seq(Employer("s1", "xian", 1, 3000), Employer("s2", null, 1, 5000), Employer(null, "shagnhai", 0, 9000), Employer(null, null, 0, 1000))).toDF()
+
+    df.groupBy("name").agg(sum("salary").as("sex"))
+      .show()
+
+  }
+
+  @Test
   def groupByKey(): Unit = {
     //groupByKey的功能就是自定义一个key，把相同key的row聚合起来进行操作
     val df = sc.parallelize(Seq(Student("s1", 11), Student("s2", 200), Student("s3", 120), Student("s4", 220), Student("s4", 1200))).toDF()
