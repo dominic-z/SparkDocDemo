@@ -15,6 +15,8 @@
         <module>MLlib</module>
         <module>XGBoost</module>
         <module>SparkAndHDFS</module>
+        <module>sparK-and-other-tool</module>
+        <module>spark-demo-common</module>
     </modules>
 
     <properties>
@@ -88,6 +90,16 @@
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>spark-demo-common</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
