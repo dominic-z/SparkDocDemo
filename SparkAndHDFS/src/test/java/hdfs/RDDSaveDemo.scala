@@ -18,31 +18,38 @@ class RDDSaveDemo {
   val spark: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
 
   @Test
-  def saveAsHadoopFile():Unit={
+  def saveAsHadoopFile(): Unit = {
 
     // 新api write
-    val pairRDD = sc.parallelize(Seq((1,"嘿,1"),(2,"你好,2")))
+    val pairRDD = sc.parallelize(Seq((1, "嘿,1"), (2, "你好,2")), 1)
 
-    val hadoopRDD = pairRDD.map(t=>{
-      (new IntWritable(t._1),new Text(t._2.getBytes("GBK")))
+    val hadoopRDD = pairRDD.map(t => {
+      (new IntWritable(t._1), new Text(t._2.getBytes("GBK")))
     })
-    hadoopRDD.saveAsNewAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[IntWritable],classOf[Text],classOf[output.TextOutputFormat[IntWritable, Text]])
+    hadoopRDD.saveAsNewAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile", classOf[IntWritable], classOf[Text],
+      classOf[output.TextOutputFormat[IntWritable, Text]])
+
+
+    pairRDD.map(s => (NullWritable.get(), new Text(s._2)))
+      .saveAsNewAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile_null", classOf[NullWritable], classOf[Text],
+        classOf[output.TextOutputFormat[NullWritable, Text]])
 
     // read
-    sc.hadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[mapred.TextInputFormat],classOf[LongWritable],classOf[Text])
-      .map(t=>{
-        (t._1.get(),new String(t._2.getBytes,0,t._2.getLength,"GBK"))
+    sc.hadoopFile("fake_hdfs/saveAsTextHadoopFile", classOf[mapred.TextInputFormat], classOf[LongWritable], classOf[Text])
+      .map(t => {
+        (t._1.get(), new String(t._2.getBytes, 0, t._2.getLength, "GBK"))
       })
       .collect()
       .foreach(println(_))
 
     // 新api
-    sc.newAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile",classOf[input.TextInputFormat],classOf[LongWritable],classOf[Text])
-      .map(t=>{
-        (t._1.get(),new String(t._2.getBytes,0,t._2.getLength,"GBK"))
+    sc.newAPIHadoopFile("fake_hdfs/saveAsTextHadoopFile", classOf[input.TextInputFormat], classOf[LongWritable], classOf[Text])
+      .map(t => {
+        (t._1.get(), new String(t._2.getBytes, 0, t._2.getLength, "GBK"))
       })
       .collect()
       .foreach(println(_))
+
   }
 
 

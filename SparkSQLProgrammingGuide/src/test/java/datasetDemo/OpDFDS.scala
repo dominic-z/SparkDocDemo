@@ -2,7 +2,8 @@ package datasetDemo
 
 import java.lang.reflect.Method
 
-import cases.{Employer, Person, Student, StudentScore}
+import cases.{Employer, Person, Person2, Student, StudentScore}
+import domain.enums.GENDER
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.spark.sql.{Row, SparkSession, TypedColumn}
 import org.apache.spark.sql.functions._
@@ -88,8 +89,8 @@ class OpDFDS {
   }
 
   @Test
-  def createDFWithOneField():Unit={
-    val df = sc.parallelize(Seq("abc","def")).toDF("id")
+  def createDFWithOneField(): Unit = {
+    val df = sc.parallelize(Seq("abc", "def")).toDF("id")
     df.show()
 
   }
@@ -343,7 +344,7 @@ class OpDFDS {
   }
 
   @Test
-  def aggAndAsOtherCol():Unit={
+  def aggAndAsOtherCol(): Unit = {
     val df = sc.parallelize(Seq(Employer("s1", "xian", 1, 3000), Employer("s2", null, 1, 5000), Employer(null, "shagnhai", 0, 9000), Employer(null, null, 0, 1000))).toDF()
 
     df.groupBy("name").agg(sum("salary").as("sex"))
@@ -390,6 +391,23 @@ class OpDFDS {
 
   @Test
   def one2Many(): Unit = {
+
+  }
+
+
+  @Test
+  def usingEnums(): Unit = {
+
+    val ds = spark.createDataset(Seq(Person2("female", GENDER.FEMALE), Person2("GENDER.FEMALE", GENDER.MALE)))
+    val df = spark.createDataFrame(Seq(Person2("female", GENDER.FEMALE), Person2("GENDER.FEMALE", GENDER.MALE)))
+    ds.show()
+
+    df.map(row => {
+      val gender = row.getAs[GENDER]("gender")
+      gender.toString
+    })
+      .collect()
+      .foreach(println)
 
   }
 }
