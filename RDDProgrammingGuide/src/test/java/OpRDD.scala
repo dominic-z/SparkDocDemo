@@ -36,6 +36,19 @@ class OpRDD {
     val data = Array((1, 1), (2, 2), (1, 3))
     val rdd = sc.parallelize(data).map((_, 1))
     println(rdd.collect().toSeq)
+
+
+    // map的返回值尽量不要使用类型不明确的值，下面的返回值在本机运行不会报错，但是曾经在线上使用时，类型推断错误导致报错了；
+    val mapped = sc.parallelize(data).map(t=>{
+      if(t._1%2==0){
+        (1L,2)
+      }else{
+        (1,2)
+      }
+    })
+
+    println(mapped.collect().toSeq)
+
   }
 
   @Test
@@ -74,5 +87,22 @@ class OpRDD {
 
     // sortBy可以通过修改隐含参数中的ordering来修改对比大小的方式
     println(rdd.sortBy(t => (t._2,t._1)).zipWithIndex.collect().toSeq)
+  }
+
+
+
+  @Test
+  def join():Unit={
+
+
+    val left = (Array.range(0, 10)++Array.range(8, 10)).map(i => (i, Random.nextInt(10)))
+    val right = Array.range(5, 15).map(i => (i, Random.nextInt(10)))
+
+    val leftRDD = sc.parallelize(left)
+    val rightRDD = sc.parallelize(right)
+
+    leftRDD.leftOuterJoin(rightRDD).collect().foreach(println)
+
+
   }
 }

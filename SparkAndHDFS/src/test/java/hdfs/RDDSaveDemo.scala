@@ -49,7 +49,6 @@ class RDDSaveDemo {
       })
       .collect()
       .foreach(println(_))
-
   }
 
 

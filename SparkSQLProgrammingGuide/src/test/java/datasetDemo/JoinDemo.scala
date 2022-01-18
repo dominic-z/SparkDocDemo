@@ -22,7 +22,7 @@ class JoinDemo {
 
   def main(args: Array[String]): Unit = {
 
-    simpleJoin
+    simpleDSJoin
     //    casesDfJoin
     //    nestedCasesDfAndSimpleDfJoin
     //    nullJoin
@@ -33,7 +33,7 @@ class JoinDemo {
    *
    */
   @Test
-  def simpleJoin(): Unit = {
+  def simpleDSJoin(): Unit = {
 
     var leftDS = Seq(Person("Andy", 32), Person("Mike", 32)).toDS()
 
@@ -164,6 +164,20 @@ class JoinDemo {
     //    val resDf = leftDS.join(rightDS, Seq("student","score"))
     //    resDf.show()
   }
+
+  @Test
+  def multiConditionJoin():Unit={
+
+    val leftDF = Seq(("mike", "male", 89),("mike", null, 89), ("andy", "male", 89),("andy", "female", 89))
+      .toDF("l_name","l_gender","l_score")
+    val rightDF = Seq(("mike", "male", "xa"), ("andy", null, "sz")).toDF("name","gender","city")
+
+    leftDF.join(rightDF,(col("l_name")===col("name") and col("l_gender")===col("gender")) or (col("l_name")===col("name")))
+      .show()
+
+
+  }
+
 }
 
 
